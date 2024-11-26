@@ -14,7 +14,7 @@ The bot uses location-based services to help users find the nearest parking hous
 Additionally, the bot includes direct navigation links for each parking house, making it easy to open the location in a navigation app and drive directly there.
 
 ### Example Interaction
-![Example Interaction](https://imgur.com/6Jp4Dd9)
+![Example Interaction](https://i.imgur.com/6Jp4Dd9.png)
 
 
 
