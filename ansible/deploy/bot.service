@@ -1,0 +1,15 @@
+# ansible/deploy/bot.service
+
+[Unit]
+Description=Zurich Parking Telegram Bot
+After=network.target
+
+[Service]
+User=<YOUR_SSH_USERNAME>
+WorkingDirectory=/home/<YOUR_SSH_USERNAME>/Zurich_Parking_Bot
+ExecStart=/home/<YOUR_SSH_USERNAME>/Zurich_Parking_Bot/.venv/bin/python bot.py
+Restart=always
+EnvironmentFile=/home/<YOUR_SSH_USERNAME>/Zurich_Parking_Bot/.env
+
+[Install]
+WantedBy=multi-user.target

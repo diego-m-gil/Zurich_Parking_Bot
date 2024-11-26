@@ -1,0 +1,70 @@
+# ansible/deploy_bot.yml
+
+---
+- name: Deploy Zurich Parking Bot
+  hosts: zurich_bot
+  become: yes
+
+  vars:
+    project_dir: /home/<YOUR_SSH_USERNAME>/Zurich_Parking_Bot
+    repo_url: https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
+    venv_dir: /home/<YOUR_SSH_USERNAME>/Zurich_Parking_Bot/.venv
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+        force: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - python3-venv
+          - python3-pip
+          - git
+          - ufw
+        state: present
+
+    - name: Clone the repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        update: yes
+        version: main
+
+    - name: Set up Python virtual environment
+      command: python3 -m venv {{ venv_dir }}
+      args:
+        creates: "{{ venv_dir }}"
+
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ project_dir }}/requirements.txt"
+        virtualenv: "{{ venv_dir }}"
+
+    - name: Copy environment file
+      copy:
+        src: deploy/.env
+        dest: "{{ project_dir }}/.env"
+        owner: <YOUR_SSH_USERNAME>
+        group: <YOUR_SSH_USERNAME>
+        mode: '0600'
+
+    - name: Copy systemd service file
+      copy:
+        src: deploy/bot.service
+        dest: /etc/systemd/system/bot.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and restart the bot service
+      systemd:
+        name: bot
+        state: restarted
+        enabled: yes
