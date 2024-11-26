@@ -2,7 +2,21 @@
 
 ## Overview
 
-ZhParkingBot is a Telegram bot designed to assist users in finding parking spaces in Zürich. The bot fetches real-time data from PLS Zürich's RSS feed https://opendata.swiss/de/dataset/parkleitsystem-echtzeitinformation-zu-freien-parkplatzen-in-verschiedenen-parkhausern and provides detailed parking information, including availability, location, and pricing. The project emphasizes automation, leveraging Ansible for deployment and GitHub Actions for CI/CD.
+ZhParkingBot is a Telegram bot designed to assist users in finding parking spaces in Zürich by providing real-time data from the [PLS Zürich RSS Feed](http://www.pls-zh.ch/plsFeed/rss). This data includes the current availability of parking spots in various parking houses, as well as their open/closed status.
+
+The bot uses location-based services to help users find the nearest parking houses to their shared location. It calculates the distance between the user and the parking houses and provides detailed information, including:
+
+- **Address**: The exact location of the parking house.
+- **Price**: Information about parking costs.
+- **Distance**: The distance from the user to each parking house.
+- **Availability**: Current free spots in real-time.
+
+Additionally, the bot includes direct navigation links for each parking house, making it easy to open the location in a navigation app and drive directly there.
+
+### Example Interaction
+![Example Interaction](https://imgur.com/6Jp4Dd9)
+
+
 
 ## Features
 
