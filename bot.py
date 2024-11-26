@@ -8,7 +8,11 @@ from bs4 import BeautifulSoup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 from telegram.constants import ParseMode
 from geopy.distance import geodesic
-from config import TELEGRAM_TOKEN
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 # Set up logging
 logging.basicConfig(
