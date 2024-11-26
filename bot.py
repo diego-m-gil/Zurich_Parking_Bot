@@ -113,37 +113,58 @@ async def handle_location(update, context):
         nearby_parkings = []
         for parking in static_data:
             name = parking.get('name')
+            # Extract latitude and longitude from coordinates
             coords = parking.get('coordinates')
-            if not name or not coords:
-                continue  # Skip if essential data is missing
+            if coords and len(coords) == 2:
+                latitude = coords[0]
+                longitude = coords[1]
+                distance = geodesic(user_location, coords).meters  # Calculate distance
+            else:
+                latitude = None
+                longitude = None
+                distance = None
 
+            # Extract dynamic data
             dynamic_info = dynamic_data.get(name, {})
             status = dynamic_info.get('status', 'N/A')
             available = dynamic_info.get('available_spots')
 
-            distance = geodesic(user_location, coords).meters
-            if distance <= radius * 1000:  # Convert km to meters
-                parking_info = {
-                    'name': name,
-                    'distance': int(distance),
-                    'available_spots': available,
-                    'status': status,
-                    'total_capacity': parking.get('total_capacity'),
-                    'link': parking.get('link'),
-                    'besonderes': parking.get('besonderes'),
-                    'normaltarif_1h': parking.get('normaltarif_1h'),
-                    'öffnungszeiten': parking.get('öffnungszeiten')
-                }
-                nearby_parkings.append(parking_info)
+            # Add latitude, longitude, and distance to parking_info
+            parking_info = {
+                'name': name,
+                'distance': int(distance) if distance is not None else "N/A",
+                'available_spots': available,
+                'status': status,
+                'total_capacity': parking.get('total_capacity'),
+                'link': parking.get('link'),
+                'besonderes': parking.get('besonderes'),
+                'normaltarif_1h': parking.get('normaltarif_1h'),
+                'öffnungszeiten': parking.get('öffnungszeiten'),
+                'latitude': latitude,
+                'longitude': longitude,
+                'address': parking.get('address'),
+            }
+            nearby_parkings.append(parking_info)
         if nearby_parkings:
             found_parkings = nearby_parkings
             logger.info(f"Found {len(found_parkings)} parkings within {radius} km radius.")
             break  # Stop searching further radii once parkings are found
 
     if found_parkings:
-        found_parkings.sort(key=lambda x: x['distance'])
+        # Filter out parkings with "N/A" distance
+        valid_parkings = [p for p in found_parkings if isinstance(p['distance'], int)]
+
+        # Sort valid parkings by distance
+        valid_parkings.sort(key=lambda x: x['distance'])
+
+        # Handle parkings with "N/A" distance separately if needed
+        na_parkings = [p for p in found_parkings if not isinstance(p['distance'], int)]
+
+        # Combine the lists if you want to include "N/A" distances at the end
+        sorted_parkings = valid_parkings + na_parkings
+
         messages = []
-        for parking in found_parkings[:5]:  # Limit to top 5 results
+        for parking in sorted_parkings[:5]:  # Limit to top 5 results
             name = parking['name']
             distance = parking['distance']
             available = parking['available_spots'] if parking['available_spots'] is not None else "N/A"
@@ -161,17 +182,17 @@ async def handle_location(update, context):
             öffnungszeiten = parking['öffnungszeiten'] if parking.get('öffnungszeiten') else "N/A"
             latitude = parking.get('latitude')
             longitude = parking.get('longitude')
+            # Create navigation link
             navigation_link = f"https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude}" if latitude and longitude else "Navigation not available"
 
             # Format the address to include a comma between street and zip code
             address = parking['address'] if parking.get('address') else "N/A"
-            # Use regex to insert a comma before the ZIP code (assumes ZIP code is 4 digits)
             formatted_address = re.sub(r'(\D)(\d{4})', r'\1, \2', address)
 
             message = (
                 f"🅿️ *{name}*\n"
                 f"📍 *Address:* {formatted_address}\n"
-                f"[➡️ Navigate Here](https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude})"
+                f"[➡️ Navigate Here](https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude}\n)"
                 f"📌 *Status:* {status}\n"
                 f"📏 *Distance:* {distance} meters\n"
                 f"🚘 *Available Spots:* {available} / {total_capacity}\n"
@@ -191,8 +212,6 @@ async def handle_location(update, context):
             "🔄 Please send your location again to try a larger radius."
         )
         logger.info("No parking spots found within 5 km radius. Prompted user to resend location with a larger radius.")
-
-
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
