@@ -65,14 +65,21 @@ def fetch_dynamic_data():
 
 async def start(update, context):
     await update.message.reply_text(
-        "Welcome to Zurich Parking Bot!\n"
-        "Send me your location, and I'll find nearby parking spots."
+        "🚗 Welcome to *Zurich Parking Bot*! 🚗\n\n"
+        "📍 Send me your location, and I'll find nearby parking spots for you. 🚘\n\n"
+        "_Disclaimer: No personal information is stored._"
     )
     logger.info("Handled /start command.")
 
 
 async def help_command(update, context):
-    await update.message.reply_text("Simply send your location to get started.")
+    await update.message.reply_text(
+        "❓ *How to use Zurich Parking Bot:*\n\n"
+        "1️⃣ Share your location to find nearby parking spots.\n"
+        "2️⃣ Receive details such as address, price, and distance.\n"
+        "3️⃣ Click the provided link to navigate to the parking house.\n\n"
+        "_Disclaimer: No personal information is stored._"
+    )
     logger.info("Handled /help command.")
 
 
@@ -86,17 +93,17 @@ async def handle_location(update, context):
             static_data = json.load(f)
     except FileNotFoundError:
         logger.error("Static data file not found.")
-        await update.message.reply_text("Sorry, parking data is not available.")
+        await update.message.reply_text("⚠️ Sorry, parking data is not available at the moment.")
         return
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON: {e}")
-        await update.message.reply_text("Sorry, there was an error processing parking data.")
+        await update.message.reply_text("⚠️ There was an error processing parking data.")
         return
 
     # Fetch dynamic data
     dynamic_data = fetch_dynamic_data()
     if not dynamic_data:
-        await update.message.reply_text("Sorry, dynamic parking data is not available at the moment.")
+        await update.message.reply_text("⚠️ Dynamic parking data is not available at the moment.")
         return
 
     radii = [1, 2, 3, 4, 5]  # in kilometers
@@ -153,24 +160,26 @@ async def handle_location(update, context):
             öffnungszeiten = parking['öffnungszeiten'] if parking.get('öffnungszeiten') else "N/A"
 
             message = (
-                f"*{name}*\n"
-                f"Status: {status}\n"
-                f"Distance: {distance} meters\n"
-                f"Available Spots: {available} / {total_capacity}\n"
-                f"Occupancy: {occupancy}\n"
-                f"Normaltarif (1h): CHF {normaltarif}\n"
-                f"Öffnungszeiten: {öffnungszeiten}\n"
-                f"[More Info]({parking['link']})"
+                f"🅿️ *{name}*\n"
+                f"📍 Address: {parking.get('address', 'N/A')}\n"
+                f"📌 Status: {status}\n"
+                f"📏 Distance: {distance} meters\n"
+                f"🚘 Available Spots: {available} / {total_capacity}\n"
+                f"📊 Occupancy: {occupancy}\n"
+                f"💰 Price (1h): CHF {normaltarif}\n"
+                f"⏰ Hours: {öffnungszeiten}\n"
+                f"[➡️ Navigate Here](https://www.google.com/maps/dir/?api=1&destination={coords[0]},{coords[1]})\n"
+                f"[ℹ️ More Info]({parking['link']})"
             )
+
             messages.append(message)
-        response = f"Found parking spots within {radius} km radius:\n\n" + "\n\n".join(messages)
+        response = f"✅ *Found parking spots within {radius} km radius:*\n\n" + "\n\n".join(messages)
         await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
         logger.info(f"Sent parking information to user within {radius} km radius.")
     else:
-        # No parkings found within maximum radius
         await update.message.reply_text(
-            "No parking spots found within 5 km radius.\n"
-            "Would you like to try a larger radius? Please send your location again."
+            "❌ No parking spots found within 5 km radius.\n"
+            "🔄 Please send your location again to try a larger radius."
         )
         logger.info("No parking spots found within 5 km radius. Prompted user to resend location with a larger radius.")
 
