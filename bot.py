@@ -163,13 +163,15 @@ async def handle_location(update, context):
             longitude = parking.get('longitude')
             navigation_link = f"https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude}" if latitude and longitude else "Navigation not available"
 
-            address = parking.get('address', 'Address not available')
+            # Format the address to include a comma between street and zip code
+            address = parking['address'] if parking.get('address') else "N/A"
+            # Use regex to insert a comma before the ZIP code (assumes ZIP code is 4 digits)
             formatted_address = re.sub(r'(\D)(\d{4})', r'\1, \2', address)
 
             message = (
                 f"🅿️ *{name}*\n"
                 f"📍 *Address:* {formatted_address}\n"
-                f"[➡️ Navigate Here]({navigation_link})\n"
+                f"[➡️ Navigate Here](https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude})"
                 f"📌 *Status:* {status}\n"
                 f"📏 *Distance:* {distance} meters\n"
                 f"🚘 *Available Spots:* {available} / {total_capacity}\n"
