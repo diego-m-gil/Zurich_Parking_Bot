@@ -158,17 +158,23 @@ async def handle_location(update, context):
 
             normaltarif = parking['normaltarif_1h'] if parking.get('normaltarif_1h') else "N/A"
             öffnungszeiten = parking['öffnungszeiten'] if parking.get('öffnungszeiten') else "N/A"
+            latitude = parking.get('latitude')
+            longitude = parking.get('longitude')
+            navigation_link = f"https://www.google.com/maps/dir/?api=1&destination={latitude},{longitude}" if latitude and longitude else "Navigation not available"
+
+            address = parking.get('address', 'Address not available')
+            formatted_address = re.sub(r'(\D)(\d{4})', r'\1, \2', address)
 
             message = (
                 f"🅿️ *{name}*\n"
-                f"📍 Address: {parking.get('address', 'N/A')}\n"
-                f"📌 Status: {status}\n"
-                f"📏 Distance: {distance} meters\n"
-                f"🚘 Available Spots: {available} / {total_capacity}\n"
-                f"📊 Occupancy: {occupancy}\n"
-                f"💰 Price (1h): CHF {normaltarif}\n"
-                f"⏰ Hours: {öffnungszeiten}\n"
-                f"[➡️ Navigate Here](https://www.google.com/maps/dir/?api=1&destination={coords[0]},{coords[1]})\n"
+                f"📍 *Address:* {formatted_address}\n"
+                f"[➡️ Navigate Here]({navigation_link})\n"
+                f"📌 *Status:* {status}\n"
+                f"📏 *Distance:* {distance} meters\n"
+                f"🚘 *Available Spots:* {available} / {total_capacity}\n"
+                f"📊 *Occupancy:* {occupancy}\n"
+                f"💰 *Normaltarif (1h):* CHF {normaltarif}\n"
+                f"⏰ *Öffnungszeiten:* {öffnungszeiten}\n"
                 f"[ℹ️ More Info]({parking['link']})"
             )
 
