@@ -1,169 +1,111 @@
-# Zurich Parking Bot
-
-![Bot Banner](https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>/blob/main/banner.png?raw=true)
+# ZhParkingBot
 
 ## Overview
 
-**Zurich Parking Bot** is a Telegram bot designed to assist users in finding and managing parking spaces in Zurich. Leveraging automation tools like **Ansible** and **GitHub Actions**, the project demonstrates a robust CI/CD pipeline ensuring seamless deployments and updates.
+ZhParkingBot is a Telegram bot designed to assist users in finding parking spaces in Zürich. The bot fetches real-time data from PLS Zürich's RSS feed https://opendata.swiss/de/dataset/parkleitsystem-echtzeitinformation-zu-freien-parkplatzen-in-verschiedenen-parkhausern and provides detailed parking information, including availability, location, and pricing. The project emphasizes automation, leveraging Ansible for deployment and GitHub Actions for CI/CD.
 
 ## Features
 
-- **Real-Time Parking Information:** Provides up-to-date information on available parking spaces.
-- **User-Friendly Interface:** Easy interaction through Telegram commands.
-- **Automated Deployment:** Utilizes Ansible for infrastructure automation.
-- **Continuous Integration/Continuous Deployment:** Implemented via GitHub Actions for streamlined updates.
+- **Real-Time Parking Updates:** Retrieves live parking availability data.
+- **Location-Based Search:** Users can find nearby parking spaces by sharing their location.
+- **Detailed Information:** Displays pricing, occupancy rates, distance, and operating hours.
+- **Navigation Links:** Offers links to navigation apps for selected parking locations.
+- **CI/CD Integration:** Automatically deploys updates with GitHub Actions.
 
-## Technologies Used
+## Technology Stack
 
-- **Programming Language:** Python 3
-- **Telegram API:** For bot interactions
-- **Ansible:** Automation tool for deployment
-- **GitHub Actions:** CI/CD pipeline management
-- **Ubuntu VPS:** Hosting the bot
+- **Python:** Core bot logic and data processing.
+- **Telegram Bot API:** User interaction and messaging.
+- **Ansible:** Automates deployment on the server.
+- **GitHub Actions:** Enables continuous integration and deployment.
+- **BeautifulSoup & Requests:** Parses parking data from the PLS Zürich RSS feed.
+- **Geopy:** Calculates distances for location-based parking recommendations.
 
 ## Project Structure
 
-Zurich_Parking_Bot/ ├── ansible/ │ ├── inventory.ini │ ├── deploy_bot.yml │ └── deploy/ │ ├── bot.service │ └── .env ├── bot.py ├── requirements.txt ├── .gitignore └── README.md
+```
+ZhParkingBot/
+├── ansible/
+│   ├── inventory.ini        # Ansible inventory file
+│   ├── deploy_bot.yml       # Main playbook
+│   └── deploy/
+│       ├── bot.service      # Systemd service for the bot
+│       └── .env             # Environment variables (excluded from Git)
+├── bot.py                   # Main bot logic
+├── data_fetcher.py          # Module for fetching and parsing parking data
+├── requirements.txt         # Python dependencies
+├── .gitignore               # Excludes sensitive files
+└── README.md                # Documentation
+```
 
-markdown
-Code kopieren
-
-## Setup Instructions
+## Setup
 
 ### Prerequisites
 
-- **Ubuntu VPS:** Ensure you have access to an Ubuntu server.
-- **Git:** Installed on your local machine.
-- **Ansible:** Installed in your WSL Ubuntu environment.
-- **GitHub Repository:** [Zurich_Parking_Bot](https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>)
+- A server (e.g., Ubuntu VPS) with Ansible installed.
+- A GitHub repository with SSH access to your server.
+- Python 3.8+ installed on the server.
 
-### 1. Clone the Repository
+### Deployment Steps
 
+#### 1. Clone the Repository
 ```bash
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
-cd <YOUR_REPO_NAME>
-2. Configure Ansible
-Inventory File: Update ansible/inventory.ini with your VPS IP and SSH user.
-ini
-Code kopieren
-[zurich_bot]
-<YOUR_VPS_IP_ADDRESS> ansible_user=<YOUR_SSH_USERNAME>
-Playbook: Ensure ansible/deploy_bot.yml has the correct repository URL and directories.
-3. Deploy Using Ansible
-bash
-Code kopieren
+git clone https://github.com/<YOUR_USERNAME>/<REPO_NAME>.git
+cd <REPO_NAME>
+```
+
+#### 2. Configure Ansible Inventory
+Edit `ansible/inventory.ini` to include your server's IP and username:
+```ini
+[zh_parking_bot]
+<YOUR_SERVER_IP> ansible_user=deployuser
+```
+
+#### 3. Deploy the Bot
+Run the Ansible playbook:
+```bash
 ansible-playbook -i ansible/inventory.ini ansible/deploy_bot.yml
-4. GitHub Actions for CI/CD
-The repository includes a GitHub Actions workflow that automatically deploys updates to your VPS upon pushing changes to the main branch.
+```
 
-Workflow File: .github/workflows/deploy.yml
-yaml
-Code kopieren
-name: Deploy Zurich Parking Bot
+#### 4. CI/CD with GitHub Actions
+GitHub Actions workflow (`.github/workflows/deploy.yml`) automates deployment on every push to the `main` branch.
 
-on:
-  push:
-    branches:
-      - main
+Update the workflow file to include your server details and add your SSH private key as a GitHub secret (`SSH_PRIVATE_KEY`).
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+## Usage
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+### Start the Bot
+1. Run the bot on your server:
+   ```bash
+   sudo systemctl start bot
+   ```
+2. Open Telegram and search for **ZhParkingBot**.
+3. Send `/start` to begin interaction.
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+### Find Parking
+1. Share your location with the bot.
+2. Receive nearby parking options with detailed information.
+3. Click on a parking option to get navigation directions.
 
-      - name: Add Server to Known Hosts
-        run: ssh-keyscan -H <YOUR_VPS_IP_ADDRESS> >> ~/.ssh/known_hosts
+## Security
 
-      - name: Run Ansible Playbook
-        run: ansible-playbook -i ansible/inventory.ini ansible/deploy_bot.yml
-Secrets Configuration:
-SSH_PRIVATE_KEY: Add your private SSH key as a GitHub secret to enable the workflow to authenticate with your VPS.
-Security Considerations
-SSH Keys: Ensure your private keys are never exposed. Use GitHub Secrets to manage sensitive information.
-Firewall: Configure UFW on your VPS to allow only necessary ports.
-Regular Updates: Keep your server and dependencies up-to-date to mitigate vulnerabilities.
-Demonstration
+- **SSH Keys:** Use GitHub Secrets to securely manage SSH private keys for CI/CD.
+- **Environment Variables:** Store sensitive data like API keys in `.env` files, excluded from version control.
+- **Server Hardening:** Use a firewall (e.g., UFW) and regularly update server packages.
 
+## License
 
-Interact with the Zurich Parking Bot on Telegram to see it in action.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-Conclusion
-The Zurich Parking Bot project not only provides a useful tool for managing parking in Zurich but also serves as a testament to effective deployment automation and CI/CD practices using Ansible and GitHub Actions. This setup ensures that updates are deployed reliably and efficiently, showcasing proficiency in modern DevOps methodologies.
+## Contact
 
-Contact
-For any inquiries or collaborations, feel free to reach out:
+For questions or feedback, feel free to reach out.
 
-Email: your_email@example.com
-LinkedIn: Your Name
-markdown
-Code kopieren
-
-- **Placeholders:**
-  - `<YOUR_GITHUB_USERNAME>`: Replace with your GitHub username.
-  - `<YOUR_REPO_NAME>`: Replace with your GitHub repository name.
-  - `<YOUR_VPS_IP_ADDRESS>`: Replace with your VPS's IP address.
-  - `<YOUR_SSH_USERNAME>`: Replace with your SSH username (e.g., `ubuntu`).
-  - `your_email@example.com`: Replace with your contact email.
-  - `your-linkedin-profile`: Replace with your LinkedIn profile URL.
 
 ---
 
-## **3. Additional Recommendations**
+### Next Steps:
 
-- **`.gitignore` Configuration:**
-
-  Ensure your `.gitignore` includes paths to sensitive files to prevent them from being pushed to GitHub.
-
-  ```gitignore
-  # Byte-compiled / optimized / DLL files
-  __pycache__/
-  *.py[cod]
-  *$py.class
-
-  # C extensions
-  *.so
-
-  # Distribution / packaging
-  .Python
-  build/
-  develop-eggs/
-  dist/
-  downloads/
-  eggs/
-  .eggs/
-  lib/
-  lib64/
-  parts/
-  sdist/
-  var/
-  *.egg-info/
-  .installed.cfg
-  *.egg
-
-  # Virtual environments
-  venv/
-  .venv/
-  ENV/
-  env/
-  env.bak/
-  venv.bak/
-
-  # PyCharm specific
-  .idea/
-
-  # Logs
-  *.log
-
-  # Secrets
-  ansible/deploy/.env
-
-  # Other
-  *.sqlite3
+1. Replace placeholders like `<YOUR_USERNAME>`, `<REPO_NAME>`, and `<YOUR_SERVER_IP>` with your actual details.
+2. Verify the `.gitignore` includes sensitive files like `.env` and `private_keys`.
+3. Push the updated `README.md` to your GitHub repository.
