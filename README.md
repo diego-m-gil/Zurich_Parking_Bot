@@ -4,6 +4,8 @@
 
 ZhParkingBot is a Telegram bot designed to assist users in finding parking spaces in Zürich by providing real-time data from the [PLS Zürich RSS Feed](http://www.pls-zh.ch/plsFeed/rss). This data includes the current availability of parking spots in various parking houses, as well as their open/closed status.
 
+You can start interacting with the bot directly by clicking here: [@ZhParkingBot on Telegram](https://t.me/ZhParkingBot).
+
 The bot uses location-based services to help users find the nearest parking houses to their shared location. It calculates the distance between the user and the parking houses and provides detailed information, including:
 
 - **Address**: The exact location of the parking house.
@@ -14,7 +16,7 @@ The bot uses location-based services to help users find the nearest parking hous
 Additionally, the bot includes direct navigation links for each parking house, making it easy to open the location in a navigation app and drive directly there.
 
 ### Example Interaction
-![Example Interaction](https://i.imgur.com/6Jp4Dd9.png)
+<img src="https://i.imgur.com/6Jp4Dd9.png" alt="Example Interaction" width="400">
 
 
 
@@ -88,14 +90,15 @@ Update the workflow file to include your server details and add your SSH private
 
 ## Usage
 
-### Start the Bot
-1. Open Telegram and search for **ZhParkingBot**.
-2. Send `/start` to begin interaction.
+1. Open Telegram and start a conversation with the bot by clicking this link: [@ZhParkingBot](https://t.me/ZhParkingBot).
+2. Send `/start` to begin interacting with the bot.
+3. Share your location with the bot, and it will respond with nearby parking options, including:
+   - Address
+   - Price
+   - Distance
+   - Availability
+4. Click on the provided navigation link to get directions to the parking spot.
 
-### Find Parking
-1. Share your location with the bot.
-2. Receive nearby parking options with detailed information.
-3. Click on a parking option to get navigation directions.
 
 ## Security
 
