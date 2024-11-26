@@ -89,12 +89,8 @@ Update the workflow file to include your server details and add your SSH private
 ## Usage
 
 ### Start the Bot
-1. Run the bot on your server:
-   ```bash
-   sudo systemctl start bot
-   ```
-2. Open Telegram and search for **ZhParkingBot**.
-3. Send `/start` to begin interaction.
+1. Open Telegram and search for **ZhParkingBot**.
+2. Send `/start` to begin interaction.
 
 ### Find Parking
 1. Share your location with the bot.
@@ -114,12 +110,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 ## Contact
 
 For questions or feedback, feel free to reach out.
-
-
----
-
-### Next Steps:
-
-1. Replace placeholders like `<YOUR_USERNAME>`, `<REPO_NAME>`, and `<YOUR_SERVER_IP>` with your actual details.
-2. Verify the `.gitignore` includes sensitive files like `.env` and `private_keys`.
-3. Push the updated `README.md` to your GitHub repository.
