@@ -9,6 +9,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 from telegram.constants import ParseMode
 from geopy.distance import geodesic
 from dotenv import load_dotenv
+import re
 
 # Load environment variables from .env
 load_dotenv()
